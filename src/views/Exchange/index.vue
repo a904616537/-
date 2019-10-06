@@ -102,6 +102,7 @@
 		height: 220px;
 		background-position: center;
 		background-size: contain;
+		background-repeat: no-repeat;
 	}
 	.infor {
 		overflow: hidden;
@@ -109,6 +110,7 @@
 	.infor-input {
 		border-bottom: 1px solid #ccc;
 		width: 100%;
+		-webkit-user-select: auto;
 	}
 	.exchange .btn-style {
 		font-size   : 14px;
