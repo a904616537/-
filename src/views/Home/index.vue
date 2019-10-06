@@ -1,43 +1,77 @@
 <template>
 	<div class="home" style="background-image: url('/static/bg.jpg')">
+		<div class="header-text">
+			<div/>
+			<p>果e站 | 芙源记 | 阳澄湖大闸蟹协会  <br />
+			联合荣誉出品</p>
+			<div/>
+		</div>
 		<div class="logo-box">
 			<img src="@/assets/logoe.png" class="logo-img">
 		</div>
 		<div class="input-box">
 			<input v-model="code" placeholder="请输入礼券卡号" class="input-style home-input">
-			<input v-model="pwd" placeholder="请输入礼券密码" class="input-style home-input">
+			<input v-model="password" placeholder="请输入礼券密码" class="input-style home-input">
 			<div class="btn-style" @click="is_exchange">兑换礼券</div>
 		</div>
-		<div class="list-box">
+		<div v-if="list.length > 0" class="list-box" >
 			<div class="list-title">兑换记录</div>
 			<div class="list-inner" v-for="(items,index) in list" :key="index">
-				<div class="list-img"></div>
+				<div class="list-img" :style="'background-image: url('+items.img+')'"></div>
 				<div class="text-style">
-					{{items.title}}
+					{{items.name}}
 				</div>
-				<div class="text-time">{{items.time}}</div>
+				<div class="text-time">{{moment(items.time)}}</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+	import { Message } from 'element-ui'
+	import {getCode}   from '../../api';
+	import moment      from 'moment';
 	export default {
 		data() {
 			return {
 				code: '',
-				pwd: '',
+				password: '',
 				list: [
-					{title: '兑换产品名称可能有十二个字1234', time: '2019年10月1日'},
-					{title: '兑换产品名称', time: '2019年10月1日'},
-					{title: '兑换产品名称有十个字', time: '2019年10月1日'},
-					{title: '兑换产品名不可超过十二个字', time: '2019年10月1日'},
+					// {title: '兑换产品名称可能有十二个字1234', time: '2019年10月1日'},
 				]
 			}
 		},
 		methods : {
 			is_exchange() {
-				this.$router.push({ path: '/exchange' })
+				getCode({code : this.code, password : this.password})
+				.then(doc => {
+					console.log('doc --->', doc)
+					if(doc.status) return Message({
+						message  : '这张券已经被使用了',
+						type     : 'error',
+						duration : 3 * 1000
+					})
+					localStorage.setItem("product", JSON.stringify(doc));
+					this.$router.push({ path: '/exchange' })
+				})
+				.catch(err => {
+					console.log('err', err)
+					this.$message({
+						message  : '没有找到礼券',
+						type     : 'error',
+						duration : 5 * 1000
+					})
+				})
+			},
+			moment(date) {
+				return moment(date).format('YYYY年MM月D日')
+			}
+		},
+		beforeMount() {
+			let log = localStorage.getItem("log");
+			if(log) {
+				this.list = JSON.parse(log);
+				console.log('this.list', this.list)
 			}
 		}
 	}
@@ -103,11 +137,33 @@
 	}
 	.text-style {
 		flex          : 1;
+		margin-left: 5px;
 		overflow      : hidden;
 		text-overflow : ellipsis;
 		white-space   : nowrap;
 	}
 	.text-time {
 		width : 105px;
+	}
+	.logo-box {
+		margin-top: 20px;
+	}
+	.header-text {
+		display: flex;
+		align-content: center;
+		flex-direction: row;
+		justify-content: center;
+		color: #F34111;
+		font-size: 12px;
+		line-height: 14px;
+	}
+	.header-text div{
+		flex: 1;
+		margin-top: 6px;
+		height: 1px;
+		background-color: #F34111;
+	}
+	.header-text p {
+		margin:0 20px;
 	}
 </style>

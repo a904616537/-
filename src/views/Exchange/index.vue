@@ -1,9 +1,9 @@
 <template>
 	<div class="exchange">
-		<div class="img-style"></div>
+		<div class="img-style" :style="'background-image: url('+product.img+')'"></div>
 		<div class="content">
-			<p class="title-style">礼券兑换的礼盒名称</p>
-			<div class="tips">大闸蟹礼盒，4公4母，4两一只，净含量xxx克。</div>
+			<p class="title-style">{{product.name}}</p>
+			<div class="tips">{{product.desc}}</div>
 			<div class="infor">
 				<div class="title">收货信息</div>	
 				<input v-model="name" placeholder="姓名" class="input-style infor-input">
@@ -16,18 +16,65 @@
 </template>
 
 <script>
+	import { MessageBox, Message } from 'element-ui'
+	import {verificationCode} from '../../api';
 	export default {
 		data() {
 			return {
 				name: '',
 				phone: '',
-				address: ''
+				address: '',
+				product : {},
+				code : {}
 			}
 		},
 		methods: {
 			to_exchange() {
-				console.log('确认兑换');
+				const model = {
+					code : this.code.code,
+					password : this.code.password,
+					address : {
+						province : this.name,
+						address  : this.address,
+						phone    : this.phone
+					}
+				}
+				verificationCode(model)
+				.then(doc => {
+					let logs = localStorage.getItem('log');
+					const model = { _id : doc._id, name : this.product.name, time : doc.verification.CreateTime, img : this.product.img};
+					if(logs) {
+						logs = JSON.parse(logs);
+						logs.push(model);
+						localStorage.setItem("log", JSON.stringify(logs));
+					} else localStorage.setItem("log", JSON.stringify([model]));
+					
+					Message({
+						message: '兑换成功',
+						type: 'success',
+						duration: 3 * 1000
+					})
+				})
+				.catch(err => {
+					Message({
+						message  : err,
+						type     : 'error',
+						duration : 3 * 1000
+					})
+				})
+				.finally(() => {
+					setTimeout(() => {
+						this.$router.replace('/')
+					}, 3000);
+				})
 			}
+		},
+		beforeMount() {
+			let product = localStorage.getItem("product");
+			if(product) {
+				this.code = JSON.parse(product);
+				this.product = JSON.parse(product).product;
+			} else this.$router.replace('/');
 		}
 	}
 </script>
