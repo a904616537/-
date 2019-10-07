@@ -46,17 +46,27 @@
 				getCode({code : this.code, password : this.password})
 				.then(doc => {
 					console.log('doc --->', doc)
-					if(doc.status) return Message({
-						message  : '这张券已经被使用了',
-						type     : 'error',
-						duration : 3 * 1000
-					})
-					localStorage.setItem("product", JSON.stringify(doc));
-					this.$router.push({ path: '/exchange' })
+					if(typeof doc == 'string') {
+						Message({
+							message  : '没有找到礼券',
+							type     : 'error',
+							duration : 5 * 1000
+						})
+					} else if(doc.status) {
+						Message({
+							message  : '礼券已被使用',
+							type     : 'error',
+							duration : 5 * 1000
+						})
+					} else {
+						localStorage.setItem("product", JSON.stringify(doc));
+						this.$router.push({ path: '/exchange' })
+					}
+					
 				})
 				.catch(err => {
 					console.log('err', err)
-					this.$message({
+					Message({
 						message  : '没有找到礼券',
 						type     : 'error',
 						duration : 5 * 1000
