@@ -28,8 +28,38 @@
 				code : {}
 			}
 		},
+		computed : {
+			validation : function() {
+				if(this.name == '') return false;
+				if(this.address == '') return false;
+				if(this.phone == '') return false;
+				else return true
+			},
+			validationPhone : function() {
+				if(!(/^1[3456789]\d{9}$/.test(this.phone))){ 
+			        return false; 
+			    }else return true;
+			}
+		},
 		methods: {
 			to_exchange() {
+				if(!this.validation) {
+					Message({
+						message  : '请填写正确的联系信息',
+						type     : 'error',
+						duration : 3 * 1000
+					})
+					return;
+				}
+				if(!this.validationPhone) {
+					Message({
+						message  : '手机号码格式输入错误！',
+						type     : 'error',
+						duration : 3 * 1000
+					})
+					return
+				}
+
 				const model = {
 					code : this.code.code,
 					password : this.code.password,
