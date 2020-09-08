@@ -2,7 +2,7 @@
 	<div class="home" style="background-image: url('/static/bg.jpg')">
 		<div class="header-text">
 			<div/>
-			<p>果e站 | 芙源记 | 阳澄湖大闸蟹协会  <br />
+			<p>爱优鲜 | 芙源记 | 阳澄湖大闸蟹协会  <br />
 			联合荣誉出品</p>
 			<div/>
 		</div>
